@@ -555,7 +555,6 @@ func installTrident() (returnError error) {
 		pvcExists     bool
 		pvExists      bool
 		migrateToCRDs bool
-		crd           *apiextensionv1beta1.CustomResourceDefinition
 	)
 
 	// Ensure legacy Trident isn't already installed
@@ -589,44 +588,6 @@ func installTrident() (returnError error) {
 		log.WithField("namespace", TridentPodNamespace).Debug("Namespace exists.")
 	} else {
 		log.WithField("namespace", TridentPodNamespace).Debug("Namespace does not exist.")
-	}
-
-	// Check for alpha snapshot CRDs
-	crdNames := []string{
-		"volumesnapshotclasses.snapshot.storage.k8s.io",
-		"volumesnapshotcontents.snapshot.storage.k8s.io",
-		"volumesnapshots.snapshot.storage.k8s.io",
-	}
-
-	for _, crdName := range crdNames {
-		// See if CRD exists
-		crdsExist, returnError = client.CheckCRDExists(crdName)
-		if returnError != nil {
-			return
-		}
-		if !crdsExist {
-			log.WithField("CRD", crdName).Debug("CRD not present.")
-			continue
-		}
-
-		// Get the CRD and check version
-		crd, returnError = client.GetCRD(crdName)
-		if returnError != nil {
-			return
-		}
-		alphaSnapshotErrorString := "kubernetes snapshot beta feature is not backwards compatible; run `tridentctl" +
-			" obliviate alpha-snapshot-crd` to remove previous kubernetes snapshot CRDs, " +
-			"then retry installation; for details, please refer to Trident’s online documentation"
-		if strings.ToLower(crd.Spec.Version) == "v1alpha1" {
-			returnError = fmt.Errorf(alphaSnapshotErrorString)
-			return
-		}
-		for _, version := range crd.Spec.Versions {
-			if strings.ToLower(version.Name) == "v1alpha1" {
-				returnError = fmt.Errorf(alphaSnapshotErrorString)
-				return
-			}
-		}
 	}
 
 	// Discover CRD data
