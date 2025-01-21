@@ -37,6 +37,6 @@ require (
 	google.golang.org/grpc v1.26.0 // github.com/grpc/grpc-go
 	k8s.io/api v0.17.0 // github.com/kubernetes/api
 	k8s.io/apiextensions-apiserver v0.17.0 // github.com/kubernetes/apiextensions-apiserver
-	k8s.io/apimachinery v0.17.0 // github.com/kubernetes/apimachinery
+	k8s.io/apimachinery v0.17.9 // github.com/kubernetes/apimachinery
 	k8s.io/client-go v0.17.0 // github.com/kubernetes/client-go
 )
